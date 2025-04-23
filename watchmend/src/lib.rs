@@ -592,7 +592,7 @@ pub mod global {
                         if let Some(code) = code {
                             code == 0 || code == -15 || max == 0
                         } else {
-                            true
+                            false
                         }
                     } else {
                         true
