@@ -22,6 +22,7 @@ pub enum Command {
     Pause(TaskFlag),
     Resume(TaskFlag),
     List(Option<TaskFlag>),
+    Info(TaskFlag),
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

@@ -9,6 +9,7 @@ pub mod resume;
 pub mod run;
 pub mod start;
 pub mod stop;
+pub mod info;
 
 use crate::common::{
     arg::{AddArgs, Commands, FlagArgs},
@@ -33,6 +34,7 @@ pub async fn handle_exec(commands: Commands, config: Config) -> Result<(), Box<d
         Commands::Pause(args) => self::pause::pause(args, config).await?,
         Commands::Resume(args) => self::resume::resume(args, config).await?,
         Commands::List(args) => self::list::list(args, config).await?,
+        Commands::Info(args) => self::info::info(args, config).await?,
     }
     Ok(())
 }

@@ -54,6 +54,8 @@ pub enum Commands {
     Resume(FlagArgs),
     /// Get tasks list
     List(ListArgs),
+    /// Info tasks
+    Info(FlagArgs),
 }
 
 #[derive(Args, Debug, PartialEq)]

@@ -20,6 +20,7 @@ pub async fn handle_exec(request: Request) -> Result<Response, Box<dyn Error>> {
         Command::Pause(tf) => global::pause(tf).await,
         Command::Resume(tf) => global::resume(tf).await,
         Command::List(condition) => global::list(condition).await,
+        Command::Info(tf)=> global::info(tf).await,
     };
     match r {
         Ok(res) => {

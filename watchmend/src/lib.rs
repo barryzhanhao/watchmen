@@ -24,6 +24,7 @@ pub mod global {
     use lazy_static::lazy_static;
     use log::info;
     use regex::Regex;
+    use sysinfo::{Pid, ProcessRefreshKind, ProcessesToUpdate, System};
     use tokio::{
         io::AsyncWriteExt,
         process::{Child, Command},
@@ -906,4 +907,42 @@ pub mod global {
             tf.id
         )))))
     }
+
+    pub async fn info(tf: TaskFlag) -> Result<Response, Box<dyn Error>> {
+        let mut tasks = TASKS.write().await;
+        if !tasks.contains_key(&tf.id) {
+            return Err(Box::new(std::io::Error::new(
+                std::io::ErrorKind::Other,
+                format!("Task [{}] not exists", tf.id),
+            )));
+        }
+        let tp = tasks.get_mut(&tf.id).unwrap();
+        let pid=tp.task.pid;
+
+        if let Some(pid) = pid {
+            let mut sys = System::new_all();
+            std::thread::sleep(sysinfo::MINIMUM_CPU_UPDATE_INTERVAL);
+            sys.refresh_processes_specifics(
+                ProcessesToUpdate::All,
+                true,
+                ProcessRefreshKind::nothing().with_cpu().with_memory().with_disk_usage()
+            );
+
+            if let Some(process) = sys.process(Pid::from(pid as usize)) {
+
+                Ok(Response::success(Some(Data::String(format!(
+                    "Task [{}],pid:{},cpu_usage:{}%,memory:{}KB,disk_usage_total_read:{}KB,disk_usage_total_write:{}KB",  tf.id,pid,process.cpu_usage(),process.memory()/1024,
+                    process.disk_usage().total_read_bytes/1024,process.disk_usage().total_written_bytes/1024,
+                )))))
+            } else {
+                 Ok(Response::wrong(format!("Task [{}] is not running", tf.id)))
+            }
+        } else {
+            Ok(Response::wrong(format!("Task [{}] is not running", tf.id)))
+        }
+
+    }
 }
+
+
+
