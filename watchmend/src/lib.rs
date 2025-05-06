@@ -570,6 +570,15 @@ pub mod global {
                 let pid = child.id();
                 let status = Some("running".to_string());
 
+                let id = tf.id;
+                tokio::spawn(async move {
+                    update(id, Some(pid), Some(status), None, None, None)
+                        .await
+                        .unwrap();
+                });
+
+                cache().await?;
+
                 let jh: JoinHandle<Option<i32>> = tokio::spawn(async move {
                     let mut child = child;
 
@@ -607,8 +616,8 @@ pub mod global {
                             None,
                             None,
                         )
-                        .await
-                        .unwrap();
+                            .await
+                            .unwrap();
                         cache().await.unwrap();
 
                         if let Some(cjh) = cjh {
@@ -623,8 +632,8 @@ pub mod global {
                             Some(true),
                             None,
                         )
-                        .await
-                        .unwrap();
+                            .await
+                            .unwrap();
                         cache().await.unwrap();
 
                         if let Some(cjh) = cjh {
@@ -637,14 +646,6 @@ pub mod global {
 
                 tp.joinhandle = Some(jh);
 
-                let id = tf.id;
-                tokio::spawn(async move {
-                    update(id, Some(pid), Some(status), None, None, None)
-                        .await
-                        .unwrap();
-                });
-
-                cache().await?;
                 Ok(Response::success(Some(Data::String(format!(
                     "Task [{}] started",
                     id
